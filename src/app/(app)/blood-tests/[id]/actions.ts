@@ -14,8 +14,36 @@ const schema = z.object({
   referenceHigh: z.union([z.literal(""), z.coerce.number().finite()]).optional(),
 });
 
+const sampleDateSchema = z.object({
+  reportId: z.uuid(),
+  sampleDate: z.iso.date(),
+});
+
 function normalizedUnit(v: string) {
   return v.toLowerCase().replace(/µ/g, "u").replace(/²/g, "2").replace(/\s/g, "").replace(/,/g, ".");
+}
+
+export async function updateSampleDate(formData: FormData) {
+  await requireUser();
+  const parsed = sampleDateSchema.safeParse({
+    reportId: formData.get("reportId"),
+    sampleDate: formData.get("sampleDate"),
+  });
+  if (!parsed.success) return;
+
+  const supabase = await createClient();
+  const { data: report } = await supabase.from("lab_reports").select("id,status").eq("id", parsed.data.reportId).maybeSingle();
+  if (!report) return;
+
+  await supabase.from("lab_reports").update({
+    sample_date: parsed.data.sampleDate,
+    status: report.status === "needs_review" ? "ready" : report.status,
+  }).eq("id", report.id);
+
+  revalidatePath(`/blood-tests/${report.id}`);
+  revalidatePath("/blood-tests");
+  revalidatePath("/dashboard");
+  revalidatePath("/biomarkers");
 }
 
 export async function upsertManualResult(formData: FormData) {
