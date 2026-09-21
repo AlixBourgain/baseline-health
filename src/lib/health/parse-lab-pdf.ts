@@ -19,7 +19,8 @@ export type ExtractedLabReport = {
 };
 
 const numberPattern = /(-?\d+(?:[\s.,]\d+)*)/g;
-const unitPattern = /(giga\/l|mg\/l|g\/l|g\/dl|µg\/l|ug\/l|mmol\/l|µmol\/l|umol\/l|u\/l|ui\/l|mui\/l|t\/l|ml\/(?:min|mn)\/1[.,]73\s*m[²2]|%)/i;
+const unitPattern = /(giga\/l|tera\/l|mg\/l|g\/l|g\/dl|µg\/l|ug\/l|mmol\/l|µmol\/l|umol\/l|u\/l|ui\/l|mui\/l|t\/l|fl|pg|ml\/(?:min|mn)\/1[.,]73\s*m[²2]|%)/i;
+const absoluteDifferentialSlugs = new Set(["neutrophiles", "eosinophiles", "basophiles", "lymphocytes", "monocytes"]);
 
 function toNumber(raw: string) {
   const normalized = raw.replace(/\s/g, "").replace(",", ".");
@@ -31,6 +32,8 @@ function normalizeExtractedUnit(raw: string | null) {
   if (!raw) return null;
   const normalized = raw.toLowerCase().replace(/\s/g, "");
   if (normalized === "giga/l") return "G/L";
+  if (normalized === "tera/l") return "T/L";
+  if (normalized === "fl") return "fL";
   return raw;
 }
 
@@ -96,9 +99,7 @@ function extractLabName(lines: string[]) {
 function extractEgfr(lines: string[]): ExtractedLabResult | null {
   for (const line of lines) {
     const normalized = normalizeText(line);
-    if (!normalized.includes("debit de filtration calcule") && !normalized.includes("dfg calcule")) {
-      continue;
-    }
+    if (!normalized.includes("debit de filtration calcule") && !normalized.includes("dfg calcule")) continue;
 
     const match = line.match(/(?:débit de filtration calculé|debit de filtration calcule|dfg calcul[eé])\s*:?\s*(\d+(?:[.,]\d+)?)\s*ml\/(?:mn|min)\/1[.,]73\s*m[²2]/i);
     if (!match) continue;
@@ -120,6 +121,27 @@ function extractEgfr(lines: string[]): ExtractedLabResult | null {
     };
   }
   return null;
+}
+
+function pickValueAndUnit(line: string, slug: string, aliasIndex: number, numbers: Array<{ raw: string; value: number; index: number }>) {
+  if (absoluteDifferentialSlugs.has(slug)) {
+    const absolute = line.match(/\d+(?:[.,]\d+)?\s*%\s*soit\s*:?\s*\*?\s*(\d+(?:[.,]\d+)?)\s*(giga\/l|g\/l)/i);
+    if (absolute) {
+      const value = toNumber(absolute[1]);
+      if (value !== null) {
+        const matchIndex = absolute.index ?? 0;
+        const valueIndex = line.indexOf(absolute[1], matchIndex);
+        return {
+          valueCandidate: { raw: absolute[1], value, index: valueIndex >= 0 ? valueIndex : matchIndex },
+          unit: normalizeExtractedUnit(absolute[2]),
+        };
+      }
+    }
+  }
+
+  const valueCandidate = numbers.find((n) => n.index >= aliasIndex) ?? numbers[0];
+  const unit = normalizeExtractedUnit(line.match(unitPattern)?.[1] ?? null);
+  return { valueCandidate, unit };
 }
 
 export async function extractLabReportFromPdf(buffer: Buffer): Promise<ExtractedLabReport> {
@@ -145,8 +167,7 @@ export async function extractLabReportFromPdf(buffer: Buffer): Promise<Extracted
 
       const aliasIndices = definition.aliases.map((alias) => aliasIndexInLine(normalizedLine, alias)).filter((index) => index >= 0);
       const aliasIndex = aliasIndices.length ? Math.min(...aliasIndices) : 0;
-      const valueCandidate = numbers.find((n) => n.index >= aliasIndex) ?? numbers[0];
-      const unit = normalizeExtractedUnit(line.match(unitPattern)?.[1] ?? null);
+      const { valueCandidate, unit } = pickValueAndUnit(line, definition.slug, aliasIndex, numbers);
       const range = inferRange(line, valueCandidate.value);
 
       if (!extracted.some((r) => r.biomarkerSlug === definition.slug)) {
