@@ -12,6 +12,12 @@ export type ExtractedLabResult = {
   flag: "low" | "normal" | "high" | "unknown";
 };
 
+export type ExtractedLabReport = {
+  sampleDate: string | null;
+  labName: string | null;
+  results: ExtractedLabResult[];
+};
+
 const numberPattern = /(-?\d+(?:[\s.,]\d+)*)/g;
 const unitPattern = /(mg\/l|g\/l|g\/dl|µg\/l|ug\/l|mmol\/l|µmol\/l|umol\/l|u\/l|ui\/l|mui\/l|t\/l|ml\/min\/1[.,]73\s*m[²2]|%)/i;
 
@@ -47,12 +53,40 @@ function computeFlag(value: number, low: number | null, high: number | null): Ex
 function aliasIndexInLine(normalizedLine: string, alias: string) {
   const normalizedAlias = normalizeText(alias);
   if (normalizedAlias.length > 3) return normalizedLine.indexOf(normalizedAlias);
-  const escaped = normalizedAlias.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const match = new RegExp(`(^|[^a-z0-9])${escaped}(?=$|[^a-z0-9])`, "i").exec(normalizedLine);
+  const escaped = normalizedAlias.replace(/[.*+?^$()|[\]\\]/g, "\\$&");
+  const match = new RegExp("(^|[^a-z0-9])" + escaped + "(?=$|[^a-z0-9])", "i").exec(normalizedLine);
   return match ? match.index + match[1].length : -1;
 }
 
-export async function extractLabResultsFromPdf(buffer: Buffer): Promise<ExtractedLabResult[]> {
+function extractSampleDate(text: string) {
+  const patterns = [
+    /pr[eé]lev[eé]\s+le\s+(\d{1,2})[./-](\d{1,2})[./-](\d{4})/i,
+    /date\s+de\s+pr[eé]l[eè]vement\s*[:\-]?\s*(\d{1,2})[./-](\d{1,2})[./-](\d{4})/i,
+    /pr[eé]l[eè]vement\s*[:\-]?\s*(\d{1,2})[./-](\d{1,2})[./-](\d{4})/i,
+  ];
+
+  for (const pattern of patterns) {
+    const match = text.match(pattern);
+    if (!match) continue;
+    const day = match[1];
+    const month = match[2];
+    const year = match[3];
+    const iso = year + "-" + month.padStart(2, "0") + "-" + day.padStart(2, "0");
+    const date = new Date(iso + "T00:00:00Z");
+    if (!Number.isNaN(date.getTime())) return iso;
+  }
+  return null;
+}
+
+function extractLabName(lines: string[]) {
+  const candidates = lines.slice(0, 15);
+  const preferred = candidates.find((line) => /laboratoire de biologie m[eé]dicale/i.test(line));
+  if (preferred) return preferred.slice(0, 120);
+  const branded = candidates.find((line) => /cerballiance|biogroup|unilabs|synlab/i.test(line));
+  return branded ? branded.slice(0, 120) : null;
+}
+
+export async function extractLabReportFromPdf(buffer: Buffer): Promise<ExtractedLabReport> {
   const parser = new PDFParse({ data: buffer });
   try {
     const result = await parser.getText();
@@ -88,8 +122,16 @@ export async function extractLabResultsFromPdf(buffer: Buffer): Promise<Extracte
       }
     }
 
-    return extracted;
+    return {
+      sampleDate: extractSampleDate(result.text),
+      labName: extractLabName(lines),
+      results: extracted,
+    };
   } finally {
     await parser.destroy();
   }
+}
+
+export async function extractLabResultsFromPdf(buffer: Buffer): Promise<ExtractedLabResult[]> {
+  return (await extractLabReportFromPdf(buffer)).results;
 }
