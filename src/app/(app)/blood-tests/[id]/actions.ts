@@ -32,13 +32,26 @@ export async function updateSampleDate(formData: FormData) {
   if (!parsed.success) return;
 
   const supabase = await createClient();
-  const { data: report } = await supabase.from("lab_reports").select("id,status").eq("id", parsed.data.reportId).maybeSingle();
+  const { data: report } = await supabase
+    .from("lab_reports")
+    .select("id,status")
+    .eq("id", parsed.data.reportId)
+    .maybeSingle();
+
   if (!report) return;
 
-  await supabase.from("lab_reports").update({
-    sample_date: parsed.data.sampleDate,
-    status: report.status === "needs_review" ? "ready" : report.status,
-  }).eq("id", report.id);
+  const { count: resultCount } = await supabase
+    .from("lab_results")
+    .select("id", { count: "exact", head: true })
+    .eq("report_id", report.id);
+
+  await supabase
+    .from("lab_reports")
+    .update({
+      sample_date: parsed.data.sampleDate,
+      status: (resultCount ?? 0) > 0 ? "ready" : "needs_review",
+    })
+    .eq("id", report.id);
 
   revalidatePath(`/blood-tests/${report.id}`);
   revalidatePath("/blood-tests");
@@ -59,7 +72,7 @@ export async function upsertManualResult(formData: FormData) {
   if (!parsed.success) return;
 
   const supabase = await createClient();
-  const { data: report } = await supabase.from("lab_reports").select("id").eq("id", parsed.data.reportId).maybeSingle();
+  const { data: report } = await supabase.from("lab_reports").select("id,sample_date").eq("id", parsed.data.reportId).maybeSingle();
   if (!report) return;
   const { data: biomarker } = await supabase.from("biomarker_catalog").select("id,display_name,canonical_unit").eq("slug", parsed.data.biomarkerSlug).maybeSingle();
   if (!biomarker) return;
@@ -83,7 +96,11 @@ export async function upsertManualResult(formData: FormData) {
     reference_high: high,
     flag,
   }, { onConflict: "report_id,biomarker_id" });
-  await supabase.from("lab_reports").update({ status: "ready" }).eq("id", report.id);
+
+  await supabase.from("lab_reports").update({
+    status: report.sample_date ? "ready" : "needs_review",
+  }).eq("id", report.id);
+
   revalidatePath(`/blood-tests/${report.id}`);
   revalidatePath("/biomarkers");
   revalidatePath("/dashboard");
