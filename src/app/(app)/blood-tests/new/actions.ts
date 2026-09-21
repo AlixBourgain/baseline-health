@@ -4,13 +4,12 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { extractLabResultsFromPdf } from "@/lib/health/parse-lab-pdf";
+import { extractLabReportFromPdf } from "@/lib/health/parse-lab-pdf";
 import { sanitizeFilename } from "@/lib/utils";
 import { sha256Hex } from "@/lib/security";
 import { getServerEnv } from "@/lib/env";
 
 const metaSchema = z.object({
-  sampleDate: z.iso.date(),
   labName: z.string().trim().max(120).optional(),
 });
 
@@ -19,7 +18,8 @@ export async function uploadBloodTest(formData: FormData) {
   const supabase = await createClient();
   const { data: consentEvents } = await supabase.from("privacy_consents").select("action,version").eq("purpose", "health_data_processing").order("occurred_at", { ascending: false }).limit(1);
   if (!consentEvents?.length || consentEvents[0].action !== "granted" || consentEvents[0].version !== getServerEnv().HEALTH_DATA_CONSENT_VERSION) redirect("/settings/privacy?consent=required");
-  const parsedMeta = metaSchema.safeParse({ sampleDate: formData.get("sampleDate"), labName: String(formData.get("labName") ?? "") || undefined });
+
+  const parsedMeta = metaSchema.safeParse({ labName: String(formData.get("labName") ?? "") || undefined });
   const file = formData.get("file");
 
   if (!parsedMeta.success || !(file instanceof File)) redirect("/blood-tests/new?error=Informations invalides");
@@ -32,14 +32,21 @@ export async function uploadBloodTest(formData: FormData) {
   const { data: duplicate } = await supabase.from("lab_reports").select("id").eq("sha256", hash).maybeSingle();
   if (duplicate) redirect(`/blood-tests/${duplicate.id}`);
 
+  let extracted;
+  try {
+    extracted = await extractLabReportFromPdf(Buffer.from(bytes));
+  } catch {
+    redirect("/blood-tests/new?error=Le PDF n’a pas pu être analysé");
+  }
+
   const { data: report, error: insertError } = await supabase.from("lab_reports").insert({
     user_id: user.id,
-    sample_date: parsedMeta.data.sampleDate,
-    lab_name: parsedMeta.data.labName || null,
+    sample_date: extracted.sampleDate,
+    lab_name: parsedMeta.data.labName || extracted.labName || null,
     original_filename: sanitizeFilename(file.name),
     sha256: hash,
     status: "processing",
-    extraction_version: "local-pdf-v1",
+    extraction_version: "local-pdf-v2",
   }).select("id").single();
 
   if (insertError || !report) redirect("/blood-tests/new?error=Impossible de créer le dossier d'analyse");
@@ -59,12 +66,11 @@ export async function uploadBloodTest(formData: FormData) {
   await supabase.from("lab_reports").update({ storage_path: path }).eq("id", report.id);
 
   try {
-    const extracted = await extractLabResultsFromPdf(Buffer.from(bytes));
-    if (extracted.length) {
-      const slugs = extracted.map((r) => r.biomarkerSlug);
+    if (extracted.results.length) {
+      const slugs = extracted.results.map((r) => r.biomarkerSlug);
       const { data: catalog } = await supabase.from("biomarker_catalog").select("id,slug,canonical_unit").in("slug", slugs);
       const bySlug = new Map((catalog ?? []).map((b) => [b.slug, b]));
-      const rows = extracted.flatMap((r) => {
+      const rows = extracted.results.flatMap((r) => {
         const biomarker = bySlug.get(r.biomarkerSlug);
         if (!biomarker) return [];
         return [{
@@ -82,7 +88,9 @@ export async function uploadBloodTest(formData: FormData) {
       });
       if (rows.length) await supabase.from("lab_results").insert(rows);
     }
-    await supabase.from("lab_reports").update({ status: extracted.length ? "ready" : "needs_review" }).eq("id", report.id);
+
+    const status = extracted.results.length && extracted.sampleDate ? "ready" : "needs_review";
+    await supabase.from("lab_reports").update({ status }).eq("id", report.id);
   } catch {
     await supabase.from("lab_reports").update({ status: "needs_review" }).eq("id", report.id);
   }
