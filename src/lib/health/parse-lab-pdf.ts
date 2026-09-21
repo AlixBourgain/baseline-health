@@ -19,7 +19,7 @@ export type ExtractedLabReport = {
 };
 
 const numberPattern = /(-?\d+(?:[\s.,]\d+)*)/g;
-const unitPattern = /(mg\/l|g\/l|g\/dl|µg\/l|ug\/l|mmol\/l|µmol\/l|umol\/l|u\/l|ui\/l|mui\/l|t\/l|ml\/min\/1[.,]73\s*m[²2]|%)/i;
+const unitPattern = /(mg\/l|g\/l|g\/dl|µg\/l|ug\/l|mmol\/l|µmol\/l|umol\/l|u\/l|ui\/l|mui\/l|t\/l|ml\/(?:min|mn)\/1[.,]73\s*m[²2]|%)/i;
 
 function toNumber(raw: string) {
   const normalized = raw.replace(/\s/g, "").replace(",", ".");
@@ -86,6 +86,35 @@ function extractLabName(lines: string[]) {
   return branded ? branded.slice(0, 120) : null;
 }
 
+function extractEgfr(lines: string[]): ExtractedLabResult | null {
+  for (const line of lines) {
+    const normalized = normalizeText(line);
+    if (!normalized.includes("debit de filtration calcule") && !normalized.includes("dfg calcule")) {
+      continue;
+    }
+
+    const match = line.match(/(?:débit de filtration calculé|debit de filtration calcule|dfg calcul[eé])\s*:?\s*(\d+(?:[.,]\d+)?)\s*ml\/(?:mn|min)\/1[.,]73\s*m[²2]/i);
+    if (!match) continue;
+
+    const value = toNumber(match[1]);
+    if (value === null) continue;
+
+    const minMatch = line.match(/>\s*(\d+(?:[.,]\d+)?)/);
+    const low = minMatch ? toNumber(minMatch[1]) : null;
+
+    return {
+      biomarkerSlug: "egfr",
+      rawName: "DFG estimé",
+      valueNumeric: value,
+      unitRaw: "mL/min/1.73m²",
+      referenceLow: low,
+      referenceHigh: null,
+      flag: computeFlag(value, low, null),
+    };
+  }
+  return null;
+}
+
 export async function extractLabReportFromPdf(buffer: Buffer): Promise<ExtractedLabReport> {
   const parser = new PDFParse({ data: buffer });
   try {
@@ -93,10 +122,14 @@ export async function extractLabReportFromPdf(buffer: Buffer): Promise<Extracted
     const lines = result.text.split(/\r?\n/).map((line) => line.replace(/\s+/g, " ").trim()).filter(Boolean);
     const extracted: ExtractedLabResult[] = [];
 
+    const egfr = extractEgfr(lines);
+    if (egfr) extracted.push(egfr);
+
     for (const line of lines) {
       const normalizedLine = normalizeText(line);
       const definition = BIOMARKERS.find((item) => item.aliases.some((alias) => aliasIndexInLine(normalizedLine, alias) >= 0));
       if (!definition) continue;
+      if (definition.slug === "egfr" && egfr) continue;
 
       const numbers = [...line.matchAll(numberPattern)]
         .map((m) => ({ raw: m[1], value: toNumber(m[1]), index: m.index ?? 0 }))
