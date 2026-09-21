@@ -125,13 +125,17 @@ function extractEgfr(lines: string[]): ExtractedLabResult | null {
 
 function pickValueAndUnit(line: string, slug: string, aliasIndex: number, numbers: Array<{ raw: string; value: number; index: number }>) {
   if (absoluteDifferentialSlugs.has(slug)) {
-    const normalized = normalizeText(line);
-    const soitIndex = normalized.indexOf("soit");
-    if (soitIndex >= 0) {
-      const candidate = numbers.find((n) => n.index > soitIndex);
-      const afterSoit = line.slice(soitIndex);
-      const unit = normalizeExtractedUnit(afterSoit.match(unitPattern)?.[1] ?? null);
-      if (candidate) return { valueCandidate: candidate, unit };
+    const absolute = line.match(/\d+(?:[.,]\d+)?\s*%\s*soit\s*:?\s*\*?\s*(\d+(?:[.,]\d+)?)\s*(giga\/l|g\/l)/i);
+    if (absolute) {
+      const value = toNumber(absolute[1]);
+      if (value !== null) {
+        const matchIndex = absolute.index ?? 0;
+        const valueIndex = line.indexOf(absolute[1], matchIndex);
+        return {
+          valueCandidate: { raw: absolute[1], value, index: valueIndex >= 0 ? valueIndex : matchIndex },
+          unit: normalizeExtractedUnit(absolute[2]),
+        };
+      }
     }
   }
 
