@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { formatDate } from "@/lib/utils";
+import { formatDate, formatReferenceRange } from "@/lib/utils";
 import { updateSampleDate, upsertManualResult } from "./actions";
 import { Button } from "@/components/ui/button";
 
@@ -55,16 +55,19 @@ export default async function BloodTestDetail({ params, searchParams }: { params
         <h2 className="font-semibold">Résultats extraits</h2>
         <p className="mt-1 text-xs text-neutral-500">Toujours vérifier avec le compte rendu original : l'extraction automatique peut se tromper.</p>
       </div>
-      <div className="divide-y divide-neutral-100">{results?.length ? results.map((r: any) => <Link href={`/biomarkers/${r.biomarker_catalog?.slug}`} key={r.id} className="grid grid-cols-[1fr_auto] items-center gap-4 p-5 hover:bg-neutral-50">
-        <div>
-          <p className="font-medium">{r.biomarker_catalog?.display_name}</p>
-          <p className="mt-1 text-xs text-neutral-500">{r.biomarker_catalog?.category}{r.reference_low != null || r.reference_high != null ? ` · référence ${r.reference_low ?? ""}–${r.reference_high ?? ""}` : ""}</p>
-        </div>
-        <div className="text-right">
-          <p className="font-semibold">{r.value_numeric} <span className="text-xs font-normal text-neutral-500">{r.unit_canonical || r.unit_raw}</span></p>
-          <Badge className="mt-1" tone={r.flag === "normal" ? "good" : r.flag === "unknown" ? "neutral" : "warn"}>{r.flag}</Badge>
-        </div>
-      </Link>) : <p className="p-10 text-center text-sm text-neutral-500">Aucun biomarqueur détecté automatiquement.</p>}</div>
+      <div className="divide-y divide-neutral-100">{results?.length ? results.map((r: any) => {
+        const reference = formatReferenceRange(r.reference_low, r.reference_high);
+        return <Link href={`/biomarkers/${r.biomarker_catalog?.slug}`} key={r.id} className="grid grid-cols-[1fr_auto] items-center gap-4 p-5 hover:bg-neutral-50">
+          <div>
+            <p className="font-medium">{r.biomarker_catalog?.display_name}</p>
+            <p className="mt-1 text-xs text-neutral-500">{r.biomarker_catalog?.category}{reference ? ` · référence ${reference}` : ""}</p>
+          </div>
+          <div className="text-right">
+            <p className="font-semibold">{r.value_numeric} <span className="text-xs font-normal text-neutral-500">{r.unit_canonical || r.unit_raw}</span></p>
+            <Badge className="mt-1" tone={r.flag === "normal" ? "good" : r.flag === "unknown" ? "neutral" : "warn"}>{r.flag}</Badge>
+          </div>
+        </Link>;
+      }) : <p className="p-10 text-center text-sm text-neutral-500">Aucun biomarqueur détecté automatiquement.</p>}</div>
     </Card>
 
     <Card className="mt-5 p-6">
