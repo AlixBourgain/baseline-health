@@ -78,7 +78,7 @@ export async function uploadBloodTest(formData: FormData) {
       .update({
         sample_date: extracted.sampleDate ?? duplicate.sample_date,
         lab_name: detectedLabName ?? duplicate.lab_name,
-        extraction_version: "local-pdf-v3",
+        extraction_version: "local-pdf-v4",
         status: extracted.results.length && (extracted.sampleDate ?? duplicate.sample_date)
           ? "ready"
           : "needs_review",
@@ -97,7 +97,7 @@ export async function uploadBloodTest(formData: FormData) {
       original_filename: sanitizeFilename(file.name),
       sha256: hash,
       status: "processing",
-      extraction_version: "local-pdf-v3",
+      extraction_version: "local-pdf-v4",
     })
     .select("id")
     .single();
