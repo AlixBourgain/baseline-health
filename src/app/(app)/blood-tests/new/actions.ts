@@ -66,18 +66,25 @@ export async function uploadBloodTest(formData: FormData) {
     .maybeSingle();
 
   if (duplicate) {
-    const updates: { sample_date?: string; lab_name?: string; extraction_version?: string } = {
-      extraction_version: "local-pdf-v2",
-    };
+    await syncExtractedResults({
+      supabase,
+      userId: user.id,
+      reportId: duplicate.id,
+      extractedResults: extracted.results,
+    });
 
-    if (extracted.sampleDate && extracted.sampleDate !== duplicate.sample_date) {
-      updates.sample_date = extracted.sampleDate;
-    }
-    if (!duplicate.lab_name && detectedLabName) {
-      updates.lab_name = detectedLabName;
-    }
+    await supabase
+      .from("lab_reports")
+      .update({
+        sample_date: extracted.sampleDate ?? duplicate.sample_date,
+        lab_name: detectedLabName ?? duplicate.lab_name,
+        extraction_version: "local-pdf-v3",
+        status: extracted.results.length && (extracted.sampleDate ?? duplicate.sample_date)
+          ? "ready"
+          : "needs_review",
+      })
+      .eq("id", duplicate.id);
 
-    await supabase.from("lab_reports").update(updates).eq("id", duplicate.id);
     redirect(`/blood-tests/${duplicate.id}`);
   }
 
@@ -90,7 +97,7 @@ export async function uploadBloodTest(formData: FormData) {
       original_filename: sanitizeFilename(file.name),
       sha256: hash,
       status: "processing",
-      extraction_version: "local-pdf-v2",
+      extraction_version: "local-pdf-v3",
     })
     .select("id")
     .single();
@@ -116,38 +123,12 @@ export async function uploadBloodTest(formData: FormData) {
   await supabase.from("lab_reports").update({ storage_path: path }).eq("id", report.id);
 
   try {
-    if (extracted.results.length) {
-      const slugs = extracted.results.map((r) => r.biomarkerSlug);
-      const { data: catalog } = await supabase
-        .from("biomarker_catalog")
-        .select("id,slug,canonical_unit")
-        .in("slug", slugs);
-
-      const bySlug = new Map((catalog ?? []).map((b) => [b.slug, b]));
-      const rows = extracted.results.flatMap((r) => {
-        const biomarker = bySlug.get(r.biomarkerSlug);
-        if (!biomarker) return [];
-
-        return [{
-          user_id: user.id,
-          report_id: report.id,
-          biomarker_id: biomarker.id,
-          raw_name: r.rawName,
-          value_numeric: r.valueNumeric,
-          unit_raw: r.unitRaw,
-          unit_canonical: unitsMatch(r.unitRaw, biomarker.canonical_unit)
-            ? biomarker.canonical_unit
-            : null,
-          reference_low: r.referenceLow,
-          reference_high: r.referenceHigh,
-          flag: r.flag,
-        }];
-      });
-
-      if (rows.length) {
-        await supabase.from("lab_results").insert(rows);
-      }
-    }
+    await syncExtractedResults({
+      supabase,
+      userId: user.id,
+      reportId: report.id,
+      extractedResults: extracted.results,
+    });
 
     const status =
       extracted.results.length && extracted.sampleDate ? "ready" : "needs_review";
@@ -164,6 +145,53 @@ export async function uploadBloodTest(formData: FormData) {
   }
 
   redirect(`/blood-tests/${report.id}`);
+}
+
+async function syncExtractedResults({
+  supabase,
+  userId,
+  reportId,
+  extractedResults,
+}: {
+  supabase: Awaited<ReturnType<typeof createClient>>;
+  userId: string;
+  reportId: string;
+  extractedResults: Awaited<ReturnType<typeof extractLabReportFromPdf>>["results"];
+}) {
+  if (!extractedResults.length) return;
+
+  const slugs = extractedResults.map((r) => r.biomarkerSlug);
+  const { data: catalog } = await supabase
+    .from("biomarker_catalog")
+    .select("id,slug,canonical_unit")
+    .in("slug", slugs);
+
+  const bySlug = new Map((catalog ?? []).map((b) => [b.slug, b]));
+  const rows = extractedResults.flatMap((r) => {
+    const biomarker = bySlug.get(r.biomarkerSlug);
+    if (!biomarker) return [];
+
+    return [{
+      user_id: userId,
+      report_id: reportId,
+      biomarker_id: biomarker.id,
+      raw_name: r.rawName,
+      value_numeric: r.valueNumeric,
+      unit_raw: r.unitRaw,
+      unit_canonical: unitsMatch(r.unitRaw, biomarker.canonical_unit)
+        ? biomarker.canonical_unit
+        : null,
+      reference_low: r.referenceLow,
+      reference_high: r.referenceHigh,
+      flag: r.flag,
+    }];
+  });
+
+  if (rows.length) {
+    await supabase
+      .from("lab_results")
+      .upsert(rows, { onConflict: "report_id,biomarker_id" });
+  }
 }
 
 function unitsMatch(raw: string | null, canonical: string | null) {
