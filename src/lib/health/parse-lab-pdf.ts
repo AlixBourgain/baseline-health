@@ -19,12 +19,19 @@ export type ExtractedLabReport = {
 };
 
 const numberPattern = /(-?\d+(?:[\s.,]\d+)*)/g;
-const unitPattern = /(mg\/l|g\/l|g\/dl|µg\/l|ug\/l|mmol\/l|µmol\/l|umol\/l|u\/l|ui\/l|mui\/l|t\/l|ml\/(?:min|mn)\/1[.,]73\s*m[²2]|%)/i;
+const unitPattern = /(giga\/l|mg\/l|g\/l|g\/dl|µg\/l|ug\/l|mmol\/l|µmol\/l|umol\/l|u\/l|ui\/l|mui\/l|t\/l|ml\/(?:min|mn)\/1[.,]73\s*m[²2]|%)/i;
 
 function toNumber(raw: string) {
   const normalized = raw.replace(/\s/g, "").replace(",", ".");
   const parsed = Number(normalized);
   return Number.isFinite(parsed) ? parsed : null;
+}
+
+function normalizeExtractedUnit(raw: string | null) {
+  if (!raw) return null;
+  const normalized = raw.toLowerCase().replace(/\s/g, "");
+  if (normalized === "giga/l") return "G/L";
+  return raw;
 }
 
 function inferRange(line: string, value: number) {
@@ -139,7 +146,7 @@ export async function extractLabReportFromPdf(buffer: Buffer): Promise<Extracted
       const aliasIndices = definition.aliases.map((alias) => aliasIndexInLine(normalizedLine, alias)).filter((index) => index >= 0);
       const aliasIndex = aliasIndices.length ? Math.min(...aliasIndices) : 0;
       const valueCandidate = numbers.find((n) => n.index >= aliasIndex) ?? numbers[0];
-      const unit = line.match(unitPattern)?.[1] ?? null;
+      const unit = normalizeExtractedUnit(line.match(unitPattern)?.[1] ?? null);
       const range = inferRange(line, valueCandidate.value);
 
       if (!extracted.some((r) => r.biomarkerSlug === definition.slug)) {
