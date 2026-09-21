@@ -15,7 +15,7 @@ function withMessage(path: string, message: string) {
 
 export async function login(formData: FormData) {
   const email = emailSchema.safeParse(formData.get("email"));
-  const password = passwordSchema.safeParse(formData.get("password"));
+  const password = z.string().min(1).max(256).safeParse(formData.get("password"));
   if (!email.success || !password.success) redirect(withMessage("/login", "Identifiants invalides."));
 
   const supabase = await createClient();
