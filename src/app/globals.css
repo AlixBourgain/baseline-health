@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f6f7f5;
+  --foreground: #151716;
+  --surface: #ffffff;
+  --muted: #747a76;
+  --border: #e4e7e3;
+  --health-normal: #1f8f5f;
+  --health-warning: #b7791f;
+  --health-critical: #c43d3d;
+}
+
+* { box-sizing: border-box; }
+html { background: var(--background); }
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  text-rendering: optimizeLegibility;
+}
+a { color: inherit; text-decoration: none; }
+button, input { font: inherit; }
+::selection { background: #dfe5df; }
+
+.health-grid {
+  background-image: linear-gradient(to right, rgba(20,24,21,.035) 1px, transparent 1px), linear-gradient(to bottom, rgba(20,24,21,.035) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
