@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { HealthOrbit } from "@/components/landing/health-orbit";
 import {
   Activity,
   ArrowRight,
@@ -195,7 +196,7 @@ export default function HomePage() {
 
           <p className="mt-4 text-xs text-neutral-400">Un outil de suivi et d’organisation. Jamais un diagnostic.</p>
 
-          <HealthField />
+          <HealthOrbit />
         </div>
       </section>
 
