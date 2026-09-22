@@ -5,7 +5,8 @@ import { createClient } from "@/lib/supabase/server";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
-import { dedupeReports, latestResultsByBiomarker } from "@/lib/health/result-selection";
+import { dedupeBiomarkerHistory, dedupeReports, latestResultsByBiomarker } from "@/lib/health/result-selection";
+import { BiomarkerTrendCards } from "@/components/health/biomarker-trend-cards";
 
 export default async function DashboardPage() {
   const user = await requireUser();
@@ -19,6 +20,40 @@ export default async function DashboardPage() {
   const reports = dedupeReports(rawReports ?? []).slice(0, 4);
   const recentResults = latestResultsByBiomarker(results ?? [], 6);
 
+  const grouped = new Map<string, any[]>();
+  for (const row of results ?? []) {
+    const slug = (row as any).biomarker_catalog?.slug;
+    if (!slug) continue;
+    const list = grouped.get(slug) ?? [];
+    list.push(row as any);
+    grouped.set(slug, list);
+  }
+
+  const trendSeries = [...grouped.entries()]
+    .map(([slug, rows]) => {
+      const history = dedupeBiomarkerHistory(rows)
+        .filter((row: any) => row.lab_reports?.sample_date && row.value_numeric != null)
+        .sort((a: any, b: any) => new Date(a.lab_reports.sample_date).getTime() - new Date(b.lab_reports.sample_date).getTime());
+
+      if (history.length < 2) return null;
+
+      const latest = history.at(-1) as any;
+      return {
+        slug,
+        name: latest.biomarker_catalog?.display_name ?? slug,
+        category: latest.biomarker_catalog?.category ?? null,
+        unit: latest.unit_canonical || latest.unit_raw || null,
+        latest: Number(latest.value_numeric),
+        values: history.map((row: any) => ({
+          date: new Intl.DateTimeFormat("fr-FR", { year: "numeric" }).format(new Date(row.lab_reports.sample_date)),
+          value: Number(row.value_numeric),
+        })),
+      };
+    })
+    .filter(Boolean)
+    .sort((a: any, b: any) => b.values.length - a.values.length)
+    .slice(0, 3);
+
   return <div className="mx-auto max-w-6xl">
     <div className="flex flex-wrap items-end justify-between gap-5"><div><p className="text-sm text-neutral-500">Votre espace santé</p><h1 className="mt-1 text-4xl font-semibold tracking-[-.035em]">Bonjour{profile?.first_name ? ` ${profile.first_name}` : ""}.</h1></div><Link href="/blood-tests/new" className="inline-flex h-11 items-center gap-2 rounded-full bg-neutral-950 px-5 text-sm font-medium text-white"><FilePlus2 className="size-4"/>Importer une analyse</Link></div>
 
@@ -28,6 +63,19 @@ export default async function DashboardPage() {
       </Card>
       <Card className="p-6 sm:p-7"><ShieldCheck className="size-6"/><h2 className="mt-5 text-xl font-semibold">Vos données vous appartiennent</h2><p className="mt-3 text-sm leading-6 text-neutral-600">Vous pouvez télécharger vos données structurées ou supprimer votre compte depuis les réglages.</p><Link href="/settings/privacy" className="mt-6 inline-flex items-center gap-2 text-sm font-medium">Contrôles de confidentialité <ArrowRight className="size-4"/></Link></Card>
     </div>
+
+    <Card className="mt-5 p-6 sm:p-7">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p className="text-sm text-neutral-500">Évolution dans le temps</p>
+          <h2 className="mt-1 text-xl font-semibold">Tes tendances biologiques</h2>
+        </div>
+        <Link href="/biomarkers" className="text-sm text-neutral-500">Voir tous les biomarqueurs</Link>
+      </div>
+      <div className="mt-6">
+        <BiomarkerTrendCards series={trendSeries as any[]} />
+      </div>
+    </Card>
 
     <Card className="mt-5 p-6 sm:p-7"><div className="flex items-center justify-between"><div><p className="text-sm text-neutral-500">Historique</p><h2 className="mt-1 text-xl font-semibold">Analyses récentes</h2></div><Link href="/blood-tests" className="text-sm text-neutral-500">Tout voir</Link></div><div className="mt-5 divide-y divide-neutral-100">{reports.length ? reports.map((report: any) => <Link key={report.id} href={`/blood-tests/${report.id}`} className="flex items-center justify-between py-4"><div><p className="font-medium">Bilan du {formatDate(report.sample_date)}</p><p className="mt-1 text-xs text-neutral-500">{report.lab_name || "Laboratoire non renseigné"}</p></div><Badge tone={report.status === "ready" ? "good" : report.status === "failed" ? "bad" : "neutral"}>{report.status === "ready" ? "Analysé" : report.status === "failed" ? "À vérifier" : "Traitement"}</Badge></Link>) : <Empty />}</div></Card>
   </div>;
