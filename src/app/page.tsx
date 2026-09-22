@@ -56,86 +56,83 @@ function Brand() {
   );
 }
 
-function DashboardPreview() {
+function HealthField() {
+  const milestones = [
+    { year: "2022", title: "Ophtalmologue", detail: "Dernier contrôle", icon: Eye, x: "8%", y: "58%", tone: "bg-[#eef4ff] text-[#416cb3]" },
+    { year: "2024", title: "Généraliste", detail: "Compte-rendu ajouté", icon: Stethoscope, x: "30%", y: "34%", tone: "bg-[#f2f2f2] text-neutral-700" },
+    { year: "2026", title: "Bilan sanguin", detail: "36 marqueurs", icon: Droplets, x: "55%", y: "56%", tone: "bg-[#ecf9f4] text-[#238060]" },
+    { year: "Aujourd’hui", title: "3 sujets à suivre", detail: "Rien à retenir par cœur", icon: HeartPulse, x: "78%", y: "28%", tone: "bg-neutral-950 text-white" },
+  ];
+
   return (
-    <div className="relative mx-auto mt-11 w-full max-w-6xl px-2 sm:px-8">
-      <div className="rounded-[30px] border border-neutral-200/70 bg-[#fbfbfb] p-2 shadow-[0_26px_80px_rgba(0,0,0,0.08)] sm:p-3">
-        <div className="overflow-hidden rounded-[22px] border border-neutral-200 bg-white">
-          <div className="grid min-h-[450px] md:grid-cols-[156px_1fr]">
-            <aside className="hidden border-r border-neutral-100 bg-[#fafafa] p-5 md:block">
-              <Brand />
-              <div className="mt-10 space-y-2 text-[12px] text-neutral-500">
-                <div className="rounded-xl bg-neutral-950 px-3 py-2.5 text-white">Accueil</div>
-                <div className="px-3 py-2.5">Ma santé</div>
-                <div className="px-3 py-2.5">Documents</div>
-                <div className="px-3 py-2.5">Analyses</div>
-                <div className="px-3 py-2.5">Timeline</div>
-              </div>
-            </aside>
+    <div className="relative mx-auto mt-14 h-[470px] w-full max-w-6xl overflow-hidden rounded-[34px] border border-neutral-200/80 bg-[#fbfbfa] shadow-[0_32px_100px_rgba(0,0,0,0.08)] sm:h-[520px]">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_28%,rgba(0,0,0,0.055),transparent_30%),linear-gradient(to_bottom,transparent,rgba(0,0,0,0.015))]" />
 
-            <div className="p-5 sm:p-7 lg:p-9">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-[13px] text-neutral-400">Lundi 21 septembre</p>
-                  <h3 className="mt-1 text-2xl font-semibold tracking-[-0.035em]">Bonjour Alex</h3>
-                  <p className="mt-1 text-sm text-neutral-500">Voici ce qui mérite ton attention.</p>
-                </div>
-                <div className="grid size-9 place-items-center rounded-full bg-neutral-100 text-xs font-medium">AB</div>
-              </div>
+      <div className="absolute left-6 top-6 z-20 flex items-center gap-3 rounded-full border border-neutral-200 bg-white/85 px-4 py-2.5 shadow-sm backdrop-blur-xl sm:left-8 sm:top-8">
+        <div className="size-2 rounded-full bg-emerald-500 baseline-pulse" />
+        <span className="text-xs font-medium text-neutral-700">Ta santé, en continu</span>
+      </div>
 
-              <div className="mt-8 grid gap-3 sm:grid-cols-2">
-                {attentionItems.map(({ icon: Icon, label, detail, tone }) => (
-                  <div key={label} className="group flex items-center gap-3 rounded-2xl border border-neutral-100 bg-white p-4 shadow-[0_8px_24px_rgba(0,0,0,0.035)]">
-                    <div className={`grid size-10 shrink-0 place-items-center rounded-xl ${tone}`}>
-                      <Icon className="size-4" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-neutral-900">{label}</p>
-                      <p className="mt-0.5 truncate text-xs text-neutral-500">{detail}</p>
-                    </div>
-                    <ChevronRight className="size-4 text-neutral-300 transition group-hover:translate-x-0.5" />
-                  </div>
-                ))}
-              </div>
+      <div className="absolute right-6 top-6 z-20 hidden rounded-full border border-neutral-200 bg-white/85 px-4 py-2.5 text-xs text-neutral-500 backdrop-blur-xl sm:block">
+        4 années reliées
+      </div>
 
-              <div className="mt-6 rounded-2xl border border-neutral-100 bg-[#fcfcfc] p-5">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium">Ta santé dans le temps</p>
-                    <p className="mt-1 text-xs text-neutral-400">Une vue simple de ton historique</p>
-                  </div>
-                  <span className="text-xs text-neutral-500">Voir la timeline</span>
-                </div>
-                <div className="mt-7 flex h-20 items-end gap-2 sm:gap-3" aria-hidden="true">
-                  {[22, 34, 28, 44, 38, 58, 48, 66, 61, 76, 70, 82].map((height, index) => (
-                    <div key={index} className="relative flex-1 rounded-full bg-neutral-100">
-                      <div className="absolute bottom-0 w-full rounded-full bg-neutral-900/80" style={{ height: `${height}%` }} />
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-3 flex justify-between text-[10px] text-neutral-400">
-                  <span>2022</span><span>2023</span><span>2024</span><span>2025</span><span>2026</span>
-                </div>
-              </div>
+      <svg className="absolute inset-x-0 top-[118px] h-[260px] w-full" viewBox="0 0 1200 260" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="healthLine" x1="0" x2="1">
+            <stop offset="0%" stopColor="#d9d9d7" />
+            <stop offset="72%" stopColor="#b9b9b6" />
+            <stop offset="100%" stopColor="#171717" />
+          </linearGradient>
+        </defs>
+        <path d="M0 190 C170 170 220 75 390 92 C560 110 620 210 790 160 C930 118 1000 35 1200 76" fill="none" stroke="url(#healthLine)" strokeWidth="2.2" strokeLinecap="round" />
+        <path d="M0 190 C170 170 220 75 390 92 C560 110 620 210 790 160 C930 118 1000 35 1200 76" fill="none" stroke="#111" strokeWidth="4" strokeLinecap="round" strokeDasharray="18 1182" className="baseline-travel" opacity=".9" />
+      </svg>
+
+      <div className="absolute bottom-10 left-6 right-6 h-px bg-neutral-200/80 sm:left-10 sm:right-10" />
+      <div className="absolute bottom-5 left-6 right-6 flex justify-between text-[10px] uppercase tracking-[0.18em] text-neutral-400 sm:left-10 sm:right-10">
+        <span>Passé</span><span>Aujourd’hui</span><span>À suivre</span>
+      </div>
+
+      {milestones.map(({ year, title, detail, icon: Icon, x, y, tone }, index) => (
+        <div
+          key={title}
+          className={`absolute z-10 hidden w-[190px] -translate-x-1/2 rounded-2xl border border-neutral-200/80 bg-white/92 p-3.5 shadow-[0_14px_36px_rgba(0,0,0,0.07)] backdrop-blur-xl transition duration-300 hover:-translate-y-1 sm:block ${index === 3 ? "ring-1 ring-neutral-900/5" : ""}`}
+          style={{ left: x, top: y }}
+        >
+          <div className="flex items-start gap-3">
+            <div className={`grid size-9 shrink-0 place-items-center rounded-xl ${tone}`}><Icon className="size-4" /></div>
+            <div className="min-w-0">
+              <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-neutral-400">{year}</p>
+              <p className="mt-1 truncate text-sm font-medium text-neutral-900">{title}</p>
+              <p className="mt-0.5 truncate text-xs text-neutral-400">{detail}</p>
             </div>
           </div>
         </div>
+      ))}
+
+      <div className="absolute left-[78%] top-[48%] hidden -translate-x-1/2 sm:block">
+        <div className="relative grid size-16 place-items-center rounded-full bg-neutral-950 text-white shadow-[0_16px_36px_rgba(0,0,0,0.18)]">
+          <span className="text-[11px] font-medium">Maintenant</span>
+          <span className="absolute inset-0 rounded-full border border-neutral-900/20 baseline-ring" />
+        </div>
       </div>
 
-      <div className="absolute -bottom-10 right-2 hidden w-[210px] rotate-[2deg] rounded-[34px] border-[7px] border-neutral-900 bg-white p-3 shadow-[0_24px_60px_rgba(0,0,0,0.18)] lg:block">
-        <div className="mx-auto h-1.5 w-14 rounded-full bg-neutral-900" />
-        <div className="mt-6">
-          <p className="text-[11px] text-neutral-400">Aujourd’hui</p>
-          <p className="mt-1 text-lg font-semibold tracking-[-0.04em]">Bonjour Alex</p>
-          <div className="mt-5 space-y-2">
-            {attentionItems.slice(0, 3).map(({ icon: Icon, label, tone }) => (
-              <div key={label} className="flex items-center gap-2 rounded-xl border border-neutral-100 p-2.5">
-                <div className={`grid size-7 place-items-center rounded-lg ${tone}`}><Icon className="size-3.5" /></div>
-                <span className="text-[10px] font-medium">{label}</span>
-              </div>
-            ))}
+      <div className="absolute inset-x-5 top-24 grid gap-3 sm:hidden">
+        {attentionItems.slice(0, 3).map(({ icon: Icon, label, detail, tone }) => (
+          <div key={label} className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
+            <div className={`grid size-10 place-items-center rounded-xl ${tone}`}><Icon className="size-4" /></div>
+            <div className="min-w-0">
+              <p className="text-sm font-medium">{label}</p>
+              <p className="truncate text-xs text-neutral-400">{detail}</p>
+            </div>
           </div>
-        </div>
+        ))}
+      </div>
+
+      <div className="absolute bottom-16 right-6 hidden max-w-[300px] text-right sm:block">
+        <p className="text-2xl font-semibold tracking-[-0.045em] text-neutral-900">Une mémoire de santé.</p>
+        <p className="mt-2 text-sm leading-6 text-neutral-500">Baseline relie les signaux dispersés pour te montrer ce qui compte maintenant.</p>
       </div>
     </div>
   );
@@ -168,18 +165,18 @@ export default function HomePage() {
 
       <section className="bg-[radial-gradient(circle_at_50%_0%,#f5f5f2_0%,#ffffff_50%)]">
         <div className="mx-auto max-w-7xl px-6 pb-20 pt-16 text-center lg:px-10 lg:pt-20">
-          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-neutral-400">Ton suivi santé personnel</p>
+          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-neutral-400">La mémoire de ta santé</p>
 
           <h1
-            className="mx-auto mt-6 max-w-[1040px] text-[clamp(3.4rem,5.8vw,5.5rem)] font-semibold leading-[0.96] tracking-[-0.06em]"
+            className="mx-auto mt-6 max-w-[1080px] text-[clamp(3.25rem,5.5vw,5.35rem)] font-semibold leading-[0.96] tracking-[-0.06em]"
             style={{ textWrap: "balance" }}
           >
-            <span className="block">Toute ta santé.</span>
-            <span className="block text-neutral-400">Enfin au même endroit.</span>
+            <span className="block">Ta santé a une histoire.</span>
+            <span className="block text-neutral-400">Baseline la relie.</span>
           </h1>
 
-          <p className="mx-auto mt-6 max-w-[650px] text-base leading-7 text-neutral-500 sm:text-[18px] sm:leading-8">
-            Rendez-vous, analyses, documents, symptômes et rappels. Baseline garde le fil pour que tu saches ce qui compte, au bon moment.
+          <p className="mx-auto mt-6 max-w-[690px] text-base leading-7 text-neutral-500 sm:text-[18px] sm:leading-8">
+            Analyses, rendez-vous, symptômes, documents et rappels deviennent un seul fil vivant. Tu n’as plus à te souvenir de tout pour prendre soin de toi.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
@@ -198,7 +195,7 @@ export default function HomePage() {
 
           <p className="mt-4 text-xs text-neutral-400">Un outil de suivi et d’organisation. Jamais un diagnostic.</p>
 
-          <DashboardPreview />
+          <HealthField />
         </div>
       </section>
 
