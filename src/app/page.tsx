@@ -15,6 +15,7 @@ import {
   Syringe,
 } from "lucide-react";
 import { BiomarkerShowcase } from "@/components/landing/biomarker-showcase";
+import { DesignCodeHero } from "@/components/landing/designcode-hero";
 
 function Brand({ inverse = false }: { inverse?: boolean }) {
   return (
@@ -57,81 +58,7 @@ const flow = [
 export default function HomePage() {
   return (
     <main className="min-h-screen overflow-hidden bg-[#f2f2ef] text-neutral-950">
-      <header className="relative z-50 border-b border-black/[0.045] bg-[#f2f2ef]/85 backdrop-blur-2xl">
-        <div className="mx-auto flex h-[68px] max-w-[1320px] items-center justify-between px-6 lg:px-10">
-          <Brand />
-          <nav className="hidden items-center gap-8 text-[13px] text-neutral-500 md:flex">
-            <a href="#vision" className="transition hover:text-neutral-950">Vision</a>
-            <a href="#biomarkers" className="transition hover:text-neutral-950">Biomarqueurs</a>
-            <a href="#how" className="transition hover:text-neutral-950">Comment ça marche</a>
-            <Link href="/privacy" className="transition hover:text-neutral-950">Sécurité</Link>
-          </nav>
-          <div className="flex items-center gap-2">
-            <Link href="/login" className="hidden px-4 py-2 text-sm text-neutral-600 sm:inline-flex">Connexion</Link>
-            <Link
-              href="/signup"
-              className="inline-flex h-10 items-center gap-2 rounded-full bg-neutral-950 px-5 text-sm font-medium text-white shadow-sm transition hover:bg-neutral-800"
-              style={{ color: "#fff" }}
-            >
-              <span style={{ color: "#fff" }}>Commencer</span>
-              <ArrowRight className="size-3.5 text-white" />
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <section className="relative">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_0%,rgba(255,255,255,.98),transparent_34%),radial-gradient(circle_at_85%_12%,rgba(211,219,255,.48),transparent_26%),radial-gradient(circle_at_55%_76%,rgba(218,239,230,.42),transparent_24%)]" />
-        <div className="relative mx-auto max-w-[1320px] px-6 pb-24 pt-16 lg:px-10 lg:pb-32 lg:pt-24">
-          <div className="mx-auto max-w-[980px] text-center">
-            <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-black/[0.06] bg-white/70 px-3.5 py-2 text-[11px] font-medium text-neutral-500 shadow-sm backdrop-blur-xl">
-              <span className="size-1.5 rounded-full bg-emerald-500" />
-              Votre santé, dans le temps
-            </div>
-            <h1
-              className="mx-auto mt-7 text-[clamp(3.6rem,6.5vw,6.7rem)] font-semibold leading-[0.91] tracking-[-0.068em]"
-              style={{ textWrap: "balance" }}
-            >
-              Toute ta santé.
-              <span className="mt-1 block text-neutral-400">Enfin au même endroit.</span>
-            </h1>
-            <p className="mx-auto mt-7 max-w-[720px] text-[17px] leading-8 text-neutral-500 sm:text-[19px]">
-              Baseline rassemble tes analyses, tes rendez-vous, tes symptômes et tes documents pour reconstruire une vision continue de ta santé.
-            </p>
-            <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-              <Link
-                href="/signup"
-                className="inline-flex h-12 items-center gap-2 rounded-full bg-neutral-950 px-6 text-sm font-medium text-white shadow-[0_8px_24px_rgba(0,0,0,.12)] transition hover:-translate-y-0.5 hover:bg-neutral-800"
-                style={{ color: "#fff" }}
-              >
-                <span style={{ color: "#fff" }}>Découvrir Baseline</span>
-                <ArrowRight className="size-4 text-white" />
-              </Link>
-              <a href="#biomarkers" className="inline-flex h-12 items-center gap-2 rounded-full border border-black/[0.07] bg-white/75 px-6 text-sm font-medium text-neutral-700 shadow-sm backdrop-blur-xl transition hover:bg-white">
-                Voir l’évolution <ChevronRight className="size-4" />
-              </a>
-            </div>
-            <p className="mt-4 text-xs text-neutral-400">Un outil de suivi et d’organisation. Jamais un diagnostic.</p>
-          </div>
-
-          <div id="biomarkers" className="mt-14 sm:mt-16">
-            <BiomarkerShowcase />
-          </div>
-
-          <div className="mx-auto mt-8 grid max-w-5xl gap-3 sm:grid-cols-3">
-            {[
-              ["36", "résultats structurés dans un bilan"],
-              ["5 ans", "d’historique peuvent être reliés"],
-              ["1 vue", "pour comprendre ce qui évolue"],
-            ].map(([value, label]) => (
-              <div key={label} className="rounded-[22px] border border-black/[0.055] bg-white/55 px-5 py-4 text-center backdrop-blur-xl">
-                <p className="text-2xl font-semibold tracking-[-0.045em]">{value}</p>
-                <p className="mt-1 text-xs leading-5 text-neutral-500">{label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <DesignCodeHero />
 
       <section id="vision" className="relative bg-[#0c0d0f] text-white">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(107,139,255,.18),transparent_28%),radial-gradient(circle_at_85%_65%,rgba(69,188,149,.13),transparent_30%)]" />
