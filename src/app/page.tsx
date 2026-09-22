@@ -58,8 +58,8 @@ function Brand() {
 
 function DashboardPreview() {
   return (
-    <div className="relative mx-auto mt-14 w-full max-w-5xl px-3 sm:px-8">
-      <div className="rounded-[28px] border border-neutral-200/80 bg-[#fbfbfb] p-2 shadow-[0_30px_90px_rgba(0,0,0,0.10)] sm:p-3">
+    <div className="relative mx-auto mt-11 w-full max-w-6xl px-2 sm:px-8">
+      <div className="rounded-[30px] border border-neutral-200/70 bg-[#fbfbfb] p-2 shadow-[0_26px_80px_rgba(0,0,0,0.08)] sm:p-3">
         <div className="overflow-hidden rounded-[22px] border border-neutral-200 bg-white">
           <div className="grid min-h-[450px] md:grid-cols-[156px_1fr]">
             <aside className="hidden border-r border-neutral-100 bg-[#fafafa] p-5 md:block">
@@ -144,39 +144,62 @@ function DashboardPreview() {
 export default function HomePage() {
   return (
     <main className="min-h-screen overflow-hidden bg-white text-neutral-950">
-      <header className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6 lg:px-10">
-        <Brand />
-        <nav className="hidden items-center gap-8 text-sm text-neutral-500 md:flex">
-          <a href="#vision" className="transition hover:text-neutral-950">Vision</a>
-          <a href="#experience" className="transition hover:text-neutral-950">Comment ça marche</a>
-          <Link href="/privacy" className="transition hover:text-neutral-950">Sécurité</Link>
-        </nav>
-        <div className="flex items-center gap-2">
-          <Link href="/login" className="hidden rounded-full px-4 py-2 text-sm text-neutral-600 transition hover:bg-neutral-50 sm:inline-flex">Connexion</Link>
-          <Link href="/signup" className="inline-flex h-10 items-center gap-2 rounded-full bg-neutral-950 px-5 text-sm font-medium text-white transition hover:bg-neutral-800">
-            Découvrir Baseline <ArrowRight className="size-3.5" />
-          </Link>
+      <header className="border-b border-neutral-100/80 bg-white/90 backdrop-blur-xl">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 lg:px-10">
+          <Brand />
+          <nav className="hidden items-center gap-8 text-[13px] text-neutral-500 md:flex">
+            <a href="#vision" className="transition hover:text-neutral-950">Vision</a>
+            <a href="#experience" className="transition hover:text-neutral-950">Comment ça marche</a>
+            <Link href="/privacy" className="transition hover:text-neutral-950">Sécurité</Link>
+          </nav>
+          <div className="flex items-center gap-2">
+            <Link href="/login" className="hidden rounded-full px-4 py-2 text-sm text-neutral-600 transition hover:bg-neutral-50 sm:inline-flex">Connexion</Link>
+            <Link
+              href="/signup"
+              style={{ color: "#fff" }}
+              className="inline-flex h-10 items-center gap-2 rounded-full bg-neutral-950 px-5 text-sm font-medium shadow-sm transition hover:bg-neutral-800"
+            >
+              <span style={{ color: "#fff" }}>Commencer</span>
+              <ArrowRight className="size-3.5 text-white" />
+            </Link>
+          </div>
         </div>
       </header>
 
-      <section className="mx-auto max-w-7xl px-6 pb-24 pt-20 text-center lg:px-10 lg:pt-28">
-        <p className="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">Votre santé. Aujourd’hui et demain.</p>
-        <h1 className="mx-auto mt-6 max-w-4xl text-[clamp(3rem,7vw,6.4rem)] font-semibold leading-[0.94] tracking-[-0.065em]">
-          Toute ta santé.<br />Enfin au même endroit.
-        </h1>
-        <p className="mx-auto mt-7 max-w-2xl text-base leading-7 text-neutral-500 sm:text-lg sm:leading-8">
-          Baseline garde le fil de ta santé, t’aide à suivre ce qui compte et te rappelle quand un sujet mérite d’être abordé avec ton médecin.
-        </p>
-        <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-          <a href="#experience" className="inline-flex h-12 items-center gap-2 rounded-full bg-neutral-950 px-6 text-sm font-medium text-white transition hover:bg-neutral-800">
-            Voir la démo <ArrowRight className="size-4" />
-          </a>
-          <a href="#vision" className="inline-flex h-12 items-center gap-2 rounded-full px-6 text-sm font-medium text-neutral-700 transition hover:bg-neutral-50">
-            Comment ça marche <ArrowRight className="size-4" />
-          </a>
-        </div>
+      <section className="bg-[radial-gradient(circle_at_50%_0%,#f5f5f2_0%,#ffffff_50%)]">
+        <div className="mx-auto max-w-7xl px-6 pb-20 pt-16 text-center lg:px-10 lg:pt-20">
+          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-neutral-400">Ton suivi santé personnel</p>
 
-        <DashboardPreview />
+          <h1
+            className="mx-auto mt-6 max-w-[1040px] text-[clamp(3.4rem,5.8vw,5.5rem)] font-semibold leading-[0.96] tracking-[-0.06em]"
+            style={{ textWrap: "balance" }}
+          >
+            <span className="block">Toute ta santé.</span>
+            <span className="block text-neutral-400">Enfin au même endroit.</span>
+          </h1>
+
+          <p className="mx-auto mt-6 max-w-[650px] text-base leading-7 text-neutral-500 sm:text-[18px] sm:leading-8">
+            Rendez-vous, analyses, documents, symptômes et rappels. Baseline garde le fil pour que tu saches ce qui compte, au bon moment.
+          </p>
+
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <a
+              href="#experience"
+              style={{ color: "#fff" }}
+              className="inline-flex h-12 items-center gap-2 rounded-full bg-neutral-950 px-6 text-sm font-medium shadow-sm transition hover:bg-neutral-800"
+            >
+              <span style={{ color: "#fff" }}>Voir la démo</span>
+              <ArrowRight className="size-4 text-white" />
+            </a>
+            <a href="#vision" className="inline-flex h-12 items-center gap-2 rounded-full border border-neutral-200 bg-white px-6 text-sm font-medium text-neutral-700 shadow-[0_1px_2px_rgba(0,0,0,0.03)] transition hover:bg-neutral-50">
+              Comment ça marche <ArrowRight className="size-4" />
+            </a>
+          </div>
+
+          <p className="mt-4 text-xs text-neutral-400">Un outil de suivi et d’organisation. Jamais un diagnostic.</p>
+
+          <DashboardPreview />
+        </div>
       </section>
 
       <section id="vision" className="border-y border-neutral-100 bg-[#fafafa]">
@@ -277,8 +300,8 @@ export default function HomePage() {
       <section className="px-6 py-28 text-center lg:py-36">
         <p className="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">Un meilleur suivi. Une vie plus sereine.</p>
         <h2 className="mx-auto mt-5 max-w-3xl text-4xl font-semibold tracking-[-0.055em] sm:text-6xl">Prends le fil de ta santé.</h2>
-        <Link href="/signup" className="mt-9 inline-flex h-12 items-center gap-2 rounded-full bg-neutral-950 px-6 text-sm font-medium text-white transition hover:bg-neutral-800">
-          Découvrir la démo <ArrowRight className="size-4" />
+        <Link href="/signup" style={{ color: "#fff" }} className="mt-9 inline-flex h-12 items-center gap-2 rounded-full bg-neutral-950 px-6 text-sm font-medium text-white transition hover:bg-neutral-800">
+          <span style={{ color: "#fff" }}>Découvrir la démo</span> <ArrowRight className="size-4 text-white" />
         </Link>
       </section>
 
