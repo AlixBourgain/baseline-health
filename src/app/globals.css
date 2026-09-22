@@ -123,3 +123,101 @@ button, input { font: inherit; }
 @media (prefers-reduced-motion: reduce) {
   .baseline-orbit *, .baseline-orbit-stage > div { animation: none !important; transition: none !important; }
 }
+
+
+/* DesignCode-inspired landing hero */
+.dc-hero {
+  --hx: 50%;
+  --hy: 50%;
+  --hrx: 0deg;
+  --hry: 0deg;
+  isolation: isolate;
+}
+.dc-hero-glow {
+  background:
+    radial-gradient(circle at var(--hx) var(--hy), rgba(125, 147, 255, .16), transparent 22%),
+    radial-gradient(circle at 76% 23%, rgba(105, 123, 255, .20), transparent 30%),
+    radial-gradient(circle at 63% 66%, rgba(83, 190, 155, .12), transparent 28%),
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,.025), transparent 56%);
+  transition: background .12s linear;
+}
+.dc-hero-grid {
+  background-image:
+    linear-gradient(rgba(255,255,255,.032) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.032) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(circle at 68% 44%, black 15%, transparent 72%);
+  opacity: .46;
+}
+.dc-hero-noise {
+  opacity: .055;
+  background-image:
+    radial-gradient(circle at 25% 25%, rgba(255,255,255,.85) 0 .5px, transparent .6px),
+    radial-gradient(circle at 75% 75%, rgba(255,255,255,.7) 0 .5px, transparent .6px);
+  background-size: 19px 19px, 23px 23px;
+}
+.dc-stage {
+  perspective: 1050px;
+}
+.dc-stage-inner {
+  transform-style: preserve-3d;
+  transform: rotateX(var(--hrx)) rotateY(var(--hry));
+  transition: transform .2s ease-out;
+}
+.dc-aura {
+  background:
+    radial-gradient(circle at 38% 32%, rgba(255,255,255,.20), transparent 16%),
+    radial-gradient(circle, rgba(133,152,255,.20) 0 26%, rgba(82,112,255,.10) 37%, transparent 67%);
+  filter: blur(2px);
+  animation: dc-breathe 5.8s ease-in-out infinite;
+}
+.dc-ring {
+  box-shadow: inset 0 0 60px rgba(255,255,255,.018), 0 0 48px rgba(110,135,255,.04);
+  animation: dc-spin 22s linear infinite;
+}
+.dc-ring-b {
+  animation-duration: 31s;
+  animation-direction: reverse;
+}
+.dc-orb {
+  background:
+    radial-gradient(circle at 35% 26%, rgba(255,255,255,.22), transparent 16%),
+    radial-gradient(circle at 60% 66%, rgba(113,137,255,.20), transparent 44%),
+    rgba(255,255,255,.04);
+  box-shadow:
+    inset 0 0 48px rgba(255,255,255,.035),
+    0 0 110px rgba(104,126,255,.19),
+    0 32px 90px rgba(0,0,0,.34);
+  backdrop-filter: blur(16px);
+  animation: dc-float 5.5s ease-in-out infinite;
+}
+.dc-orb-inner {
+  box-shadow: inset 0 0 34px rgba(255,255,255,.035);
+}
+.dc-float-card,
+.dc-chart-card {
+  transition: transform .3s ease, border-color .3s ease, background .3s ease;
+}
+.dc-float-card:hover {
+  transform: translateY(-5px) scale(1.015);
+  border-color: rgba(255,255,255,.18);
+  background: rgba(255,255,255,.09);
+}
+.dc-chart-card:hover {
+  border-color: rgba(255,255,255,.16);
+}
+@keyframes dc-breathe {
+  0%, 100% { transform: scale(.96); opacity: .72; }
+  50% { transform: scale(1.04); opacity: 1; }
+}
+@keyframes dc-spin {
+  from { transform: rotate(0deg) rotateX(64deg); }
+  to { transform: rotate(360deg) rotateX(64deg); }
+}
+@keyframes dc-float {
+  0%,100% { transform: translate(-50%,-50%) translateZ(42px) translateY(0); }
+  50% { transform: translate(-50%,-50%) translateZ(60px) translateY(-8px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dc-hero *, .dc-stage-inner { animation: none !important; transition: none !important; }
+}
