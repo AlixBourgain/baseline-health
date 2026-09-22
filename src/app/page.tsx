@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { HealthOrbit } from "@/components/landing/health-orbit";
+import { BiomarkerShowcase } from "@/components/landing/biomarker-showcase";
 import {
   Activity,
   ArrowRight,
@@ -141,8 +141,8 @@ function HealthField() {
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen overflow-hidden bg-white text-neutral-950">
-      <header className="border-b border-neutral-100/80 bg-white/90 backdrop-blur-xl">
+    <main className="min-h-screen overflow-hidden bg-[#f4f4f2] text-neutral-950">
+      <header className="border-b border-white/60 bg-[#f4f4f2]/80 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 lg:px-10">
           <Brand />
           <nav className="hidden items-center gap-8 text-[13px] text-neutral-500 md:flex">
@@ -164,8 +164,8 @@ export default function HomePage() {
         </div>
       </header>
 
-      <section className="bg-[radial-gradient(circle_at_50%_0%,#f5f5f2_0%,#ffffff_50%)]">
-        <div className="mx-auto max-w-7xl px-6 pb-20 pt-16 text-center lg:px-10 lg:pt-20">
+      <section className="relative overflow-hidden bg-[radial-gradient(circle_at_18%_0%,rgba(255,255,255,.95),transparent_36%),radial-gradient(circle_at_82%_10%,rgba(220,225,255,.5),transparent_26%),linear-gradient(180deg,#f4f4f2_0%,#ececea_100%)]">
+        <div className="relative mx-auto max-w-7xl px-6 pb-24 pt-16 text-center lg:px-10 lg:pt-20">
           <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-neutral-400">La mémoire de ta santé</p>
 
           <h1
@@ -196,7 +196,7 @@ export default function HomePage() {
 
           <p className="mt-4 text-xs text-neutral-400">Un outil de suivi et d’organisation. Jamais un diagnostic.</p>
 
-          <HealthOrbit />
+          <BiomarkerShowcase />
         </div>
       </section>
 
