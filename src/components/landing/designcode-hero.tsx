@@ -21,7 +21,7 @@ const orbitCards = [
     title: "Ferritine",
     value: "32 ng/mL",
     meta: "12 janv. 2024",
-    className: "left-[4%] top-[11%] -rotate-[3deg]",
+    className: "left-[2%] top-[8%] -rotate-[2deg]",
   },
   {
     icon: CalendarDays,
@@ -29,7 +29,7 @@ const orbitCards = [
     title: "Dermatologue",
     value: "Contrôle annuel",
     meta: "3 avr. 2024",
-    className: "right-[3%] top-[8%] rotate-[2deg]",
+    className: "right-[2%] top-[8%] rotate-[1.5deg]",
   },
   {
     icon: Activity,
@@ -37,7 +37,7 @@ const orbitCards = [
     title: "Fatigue",
     value: "Plus présente en fin de journée",
     meta: "14 févr. 2024",
-    className: "left-[1%] bottom-[16%] rotate-[2deg]",
+    className: "left-[1%] bottom-[13%] rotate-[1.5deg]",
   },
   {
     icon: FileText,
@@ -45,18 +45,18 @@ const orbitCards = [
     title: "Compte rendu",
     value: "IRM genou",
     meta: "12 mars 2024",
-    className: "right-[1%] bottom-[14%] -rotate-[2deg]",
+    className: "right-[1%] bottom-[12%] -rotate-[1.5deg]",
   },
 ];
 
 export function DesignCodeHero() {
   return (
     <>
-      <section className="relative min-h-[940px] overflow-hidden bg-[#05070b] text-white">
+      <section className="relative min-h-[960px] overflow-hidden bg-[#05070b] text-white">
         <img
           src="/landing/baseline-landscape.svg"
           alt=""
-          className="absolute inset-0 h-full w-full object-cover opacity-90"
+          className="absolute inset-0 h-full w-full object-cover object-center opacity-[0.96]"
         />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(4,5,8,.92)_0%,rgba(5,6,9,.58)_42%,rgba(5,6,9,.16)_70%,rgba(5,6,9,.38)_100%)]" />
         <div className="absolute inset-x-0 top-0 h-56 bg-[linear-gradient(to_bottom,rgba(4,5,8,.94),transparent)]" />
@@ -67,11 +67,12 @@ export function DesignCodeHero() {
             baseline<span className="align-top text-[14px]">*</span>
           </Link>
 
-          <nav className="hidden items-center gap-8 text-[13px] text-white/56 md:flex">
+          <nav className="hidden items-center gap-9 text-[13px] text-white/56 md:flex">
             <a href="#problem" className="transition hover:text-white">Pourquoi</a>
             <a href="#biomarkers" className="transition hover:text-white">Biomarqueurs</a>
             <a href="#how" className="transition hover:text-white">Comment ça marche</a>
             <Link href="/privacy" className="transition hover:text-white">Sécurité</Link>
+            <a href="#testimonials" className="transition hover:text-white">Témoignages</a>
           </nav>
 
           <div className="flex items-center gap-2">
@@ -86,14 +87,14 @@ export function DesignCodeHero() {
         </div>
 
         <div className="relative z-10 mx-auto grid max-w-[1360px] gap-12 px-6 pb-24 pt-16 lg:grid-cols-[0.78fr_1.22fr] lg:items-center lg:px-10 lg:pb-28 lg:pt-20">
-          <div className="max-w-[590px]">
+          <div className="max-w-[610px]">
             <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-white/38">
               Vos données. Un meilleur vous.
             </p>
 
-            <h1 className="mt-6 text-[clamp(3.5rem,5.4vw,5.7rem)] font-semibold leading-[0.91] tracking-[-0.068em]">
+            <h1 className="mt-6 text-[clamp(3.55rem,5.35vw,5.8rem)] font-semibold leading-[0.91] tracking-[-0.068em]">
               Toute ta santé.
-              <span className="block bg-[linear-gradient(100deg,#ffffff_5%,#9db0ff_55%,#9ee4d0_100%)] bg-clip-text text-transparent">
+              <span className="block text-white">
                 Enfin connectée.
               </span>
             </h1>
@@ -142,8 +143,8 @@ export function DesignCodeHero() {
             </div>
           </div>
 
-          <div className="relative min-h-[570px]">
-            <div className="absolute left-1/2 top-1/2 size-[330px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/[0.12] bg-[radial-gradient(circle_at_38%_34%,rgba(255,255,255,.18),rgba(75,91,151,.13)_30%,rgba(7,9,14,.5)_70%)] shadow-[0_0_90px_rgba(105,126,255,.18),inset_0_0_70px_rgba(255,255,255,.03)] backdrop-blur-xl sm:size-[390px]">
+          <div className="relative min-h-[590px]">
+            <div className="absolute left-1/2 top-1/2 size-[350px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/[0.12] bg-[radial-gradient(circle_at_38%_34%,rgba(255,255,255,.18),rgba(75,91,151,.13)_30%,rgba(7,9,14,.5)_70%)] shadow-[0_0_90px_rgba(105,126,255,.18),inset_0_0_70px_rgba(255,255,255,.03)] backdrop-blur-xl sm:size-[405px]">
               <div className="absolute inset-[12%] rounded-full border border-white/[0.08]" />
               <div className="absolute inset-[25%] rounded-full border border-white/[0.06]" />
               <div className="absolute inset-0 animate-[spin_26s_linear_infinite] rounded-full border border-dashed border-white/[0.08]" />
@@ -162,7 +163,7 @@ export function DesignCodeHero() {
             {orbitCards.map(({ icon: Icon, eyebrow, title, value, meta, className }) => (
               <div
                 key={eyebrow}
-                className={`absolute hidden w-[220px] rounded-[22px] border border-white/[0.14] bg-[linear-gradient(145deg,rgba(255,255,255,.12),rgba(255,255,255,.045))] p-4 shadow-[0_24px_80px_rgba(0,0,0,.34)] backdrop-blur-2xl sm:block ${className}`}
+                className={`absolute hidden w-[226px] rounded-[22px] border border-white/[0.14] bg-[linear-gradient(145deg,rgba(255,255,255,.12),rgba(255,255,255,.045))] p-4 shadow-[0_24px_80px_rgba(0,0,0,.34)] backdrop-blur-2xl sm:block ${className}`}
               >
                 <div className="flex items-start gap-3">
                   <div className="grid size-9 shrink-0 place-items-center rounded-xl border border-white/[0.12] bg-white/[0.07]">
@@ -178,7 +179,7 @@ export function DesignCodeHero() {
               </div>
             ))}
 
-            <div className="absolute right-[2%] top-[46%] hidden max-w-[170px] -rotate-[8deg] text-[22px] font-medium italic leading-tight tracking-[-0.04em] text-white/42 xl:block">
+            <div className="absolute right-[2%] top-[46%] hidden max-w-[170px] -rotate-[8deg] text-[22px] font-medium italic leading-tight tracking-[-0.04em] text-white/50 xl:block">
               Une histoire
               <span className="block">plus claire</span>
               <span className="block">de ta santé</span>
@@ -205,7 +206,7 @@ export function DesignCodeHero() {
             <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-white/34">Biomarqueurs</p>
             <h2 className="mt-5 max-w-[520px] text-[clamp(2.8rem,4.7vw,5rem)] font-semibold leading-[0.94] tracking-[-0.06em]">
               Voyez l’évolution
-              <span className="block text-white/36">de vos marqueurs.</span>
+              <span className="block">de vos marqueurs.</span>
             </h2>
             <p className="mt-6 max-w-[500px] text-[16px] leading-7 text-white/48">
               Des tendances claires pour mieux comprendre aujourd’hui et suivre ce qui évolue année après année.
