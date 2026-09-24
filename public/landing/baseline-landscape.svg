@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#060912"/>
+      <stop offset=".55" stop-color="#0a0f1a"/>
+      <stop offset="1" stop-color="#0a0b0f"/>
+    </linearGradient>
+    <radialGradient id="planet" cx="38%" cy="42%" r="60%">
+      <stop offset="0" stop-color="#7fa4ff" stop-opacity=".42"/>
+      <stop offset=".58" stop-color="#2a3d72" stop-opacity=".5"/>
+      <stop offset="1" stop-color="#111727" stop-opacity=".05"/>
+    </radialGradient>
+    <linearGradient id="ridge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#111722"/>
+      <stop offset="1" stop-color="#050608"/>
+    </linearGradient>
+    <radialGradient id="horizon" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ffdca8" stop-opacity=".9"/>
+      <stop offset=".28" stop-color="#d49a56" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#d49a56" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1600" height="1000" fill="url(#sky)"/>
+  <g opacity=".55" fill="#dbe6ff">
+    <circle cx="140" cy="150" r="1.2"/><circle cx="290" cy="215" r=".8"/><circle cx="430" cy="120" r="1"/>
+    <circle cx="610" cy="180" r=".9"/><circle cx="870" cy="110" r="1.1"/><circle cx="1010" cy="230" r=".8"/>
+    <circle cx="1190" cy="135" r="1.2"/><circle cx="1340" cy="205" r=".9"/><circle cx="1500" cy="95" r="1"/>
+    <circle cx="760" cy="300" r=".8"/><circle cx="1120" cy="320" r=".9"/><circle cx="360" cy="330" r=".8"/>
+  </g>
+
+  <circle cx="1210" cy="175" r="235" fill="url(#planet)" opacity=".95"/>
+  <circle cx="1210" cy="175" r="237" fill="none" stroke="#8cabff" stroke-opacity=".16" stroke-width="2"/>
+
+  <ellipse cx="800" cy="715" rx="235" ry="115" fill="url(#horizon)" opacity=".6"/>
+
+  <path d="M0 690 L140 620 L260 665 L390 575 L510 660 L625 585 L760 650 L890 560 L1040 650 L1200 585 L1360 650 L1490 590 L1600 645 L1600 1000 L0 1000 Z" fill="url(#ridge)"/>
+  <path d="M0 760 L140 700 L280 748 L430 680 L560 742 L720 675 L880 740 L1010 690 L1160 742 L1320 700 L1460 748 L1600 720 L1600 1000 L0 1000 Z" fill="#07090d"/>
+
+  <path d="M0 812 C230 775 360 804 540 790 C760 772 970 804 1170 785 C1335 769 1450 795 1600 778 L1600 1000 L0 1000 Z" fill="#050608"/>
+  <path d="M0 695 C270 670 430 706 620 690 C820 672 1030 705 1250 688 C1410 676 1500 692 1600 685" fill="none" stroke="#d3b17d" stroke-opacity=".12" stroke-width="2"/>
+</svg>
